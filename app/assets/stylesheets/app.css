@@ -1,0 +1,19 @@
+.full-border {
+	border: thin solid black;
+}
+
+.margin-10 {
+	margin: 10px;
+}
+
+.online {
+	background-color: green;
+}
+
+.away {
+	background-color: orange;
+}
+
+.ofline {
+	
+}

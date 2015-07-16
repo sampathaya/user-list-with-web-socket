@@ -10,4 +10,8 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
+
+  def self.admin_users
+  	User.where(role: User.roles['admin']).map{|u| u.id}
+  end
 end

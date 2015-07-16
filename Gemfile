@@ -1,7 +1,13 @@
 source 'https://rubygems.org'
 ruby '2.1.2'
 gem 'rails', '4.1.1'
-gem 'pg'
+group :development, :test do
+  gem 'sqlite3'
+  gem 'puma'
+end
+group :production do
+  gem 'pg'
+end
 gem 'sass-rails', '~> 4.0.3'
 gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.0.0'
@@ -14,9 +20,12 @@ gem 'bootstrap-sass'
 gem 'devise'
 gem 'haml-rails'
 gem 'high_voltage'
-gem 'puma'
+
 gem 'simple_form'
 gem 'faye-websocket'
+group :production do
+  gem 'thin'
+end
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_21]

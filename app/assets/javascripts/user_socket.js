@@ -1,7 +1,7 @@
 var UserSocket = function(user_id){
   this.user_id = user_id;
 
-  this.socket = new WebSocket("ws://wsulist.herokuapp.com/users/" + this.user_id.toString());
+  this.socket = new WebSocket(App.websocket_url + "users/" + this.user_id.toString());
   console.log(this.socket);
   this.initIt();
 };

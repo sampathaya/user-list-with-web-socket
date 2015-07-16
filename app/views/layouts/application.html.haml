@@ -13,3 +13,8 @@
     %main{:role => "main"}
       = render 'layouts/messages'
       = yield
+
+:javascript
+  App = {
+    websocket_url: "ws://#{request.host}:#{request.port}/"
+  };

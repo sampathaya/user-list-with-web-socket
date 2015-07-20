@@ -2,15 +2,20 @@ var UserSocket = function(user_id){
   this.user_id = user_id;
 
   this.socket = new WebSocket(App.websocket_url + "users/" + this.user_id.toString());
-  console.log(this.socket);
+  // console.log(this.socket);
   this.initIt();
 };
 
 UserSocket.prototype.initIt = function() {
   var that = this;
 
+  $(".rdo").change(function(e) {
+    e.preventDefault();
+    that.socket.send('change_status ' + that.user_id.toString() + ' ' + this.value);
+  });
+
   this.socket.onmessage = function(e) {
-  	console.log(e);
+  	// console.log(e);
   	var tokens = e.data.split(" ");
   	switch(tokens[0]) {
   		case "users":
@@ -36,7 +41,7 @@ UserSocket.prototype.initIt = function() {
 
   this.socket.onclose = function(e) {
   	// alert('going awayyyyyyy');
-  	console.log(e);
+  	// console.log(e);
   	that.socket.close(e.code, e.reason);
   }
 };

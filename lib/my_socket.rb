@@ -34,8 +34,16 @@ class MySocket
 	      case _type
 	      when "new_session"
 	      	handle_new_sessions(tokens,socket)
-	      	broadcast("online", find_user_id(socket))
+	      	user = User.find(find_user_id(socket))
+	      	user.update_attribute(:status, user.status)
+	      	# broadcast("online", user.id)
+	      	public_broadcast
+	      when 'change_status'
+	      	user = User.find(find_user_id(socket))
+	      	user.update_attribute(:status, tokens[1])
+	      	public_broadcast
 	      end
+
 	    rescue Exception => e
 	    	puts e
 	    	puts e.backtrace
@@ -43,9 +51,10 @@ class MySocket
 		end
 
 		socket.on :close do |event|
+
 			user_id = find_user_id(socket)
-			@clients.delete(user_id.to_i)
-			broadcast("ofline", user_id)
+			@clients.delete(user_id.to_i) if user_id
+			broadcast("ofline", user_id) if user_id
 		end
 
 		socket
@@ -57,14 +66,24 @@ class MySocket
 		end
 	end
 
+	def public_broadcast
+		@clients.values.flatten.each do |client|
+			user_id = find_user_id(client)
+			user = User.find(user_id) if user_id
+			broadcast(user.status, user.id) if user_id
+		end
+	end
+
 	def find_user_id socket
+		user_id = nil
 		@clients.each do |client|
 			if client[1].class == Array
-				return client[0] if client[1].include?(socket)
+				user_id = client[0] if client[1].include?(socket)
 			else
-				return client[0] if client[1] == socket
+				user_id = client[0] if client[1] == socket
 			end
 		end
+		user_id
 	end
 
 	def handle_new_sessions(tokens, socket)
@@ -78,13 +97,20 @@ class MySocket
   	else
   		@clients[user_id.to_i] = socket
   	end
+
+  	@clients.values.flatten.each do |client|
+			client.send "users #{User.all.count} #{@clients.count} #{user.id} #{user.name} #{user.email}"
+		end
+
+
+
   	
-  	User.admin_users.each do |admin_user|
-  		if @clients.fetch(admin_user).class == Array
-  			@clients.fetch(admin_user).flatten.collect{|skt| skt.send "users #{User.all.count} #{@clients.count} #{user.id} #{user.name} #{user.email}"}
-  		else
-  			@clients.fetch(admin_user).send "users #{User.all.count} #{@clients.count} #{user.id} #{user.name} #{user.email}"
-  		end
-  	end
+  	# User.admin_users.each do |admin_user|
+  	# 	if @clients.fetch(admin_user).class == Array
+  	# 		@clients.fetch(admin_user).flatten.collect{|skt| skt.send "users #{User.all.count} #{@clients.count} #{user.id} #{user.name} #{user.email}"}
+  	# 	else
+  	# 		@clients.fetch(admin_user).send "users #{User.all.count} #{@clients.count} #{user.id} #{user.name} #{user.email}"
+  	# 	end
+  	# end
 	end
 end

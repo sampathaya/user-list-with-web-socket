@@ -14,7 +14,14 @@
       = render 'layouts/messages'
       = yield
 
-:javascript
-  App = {
-    websocket_url: "ws://#{request.host}:#{request.port}/"
-  };
+- if current_user
+  :javascript
+    App = {
+      websocket_url: "ws://#{request.host}:#{request.port}/"
+    };
+
+    $(function(){
+      
+      var user_id = "#{current_user.id}";
+      var user_socket = new UserSocket(user_id);
+    });
